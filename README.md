@@ -1,75 +1,96 @@
-# Flask mailer
+# Flask Mailer
 
-Une application web simple pour envoyer des emails via un formulaire de contact, construite avec Flask et Flask-Mail.
+[![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)](https://python.org)
+[![Flask Version](https://img.shields.io/badge/flask-2.3.3-green.svg)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Installation et Configuration
+Une application web élégante et simple pour envoyer des emails via un formulaire de contact, construite avec Flask et Flask-Mail.
+
+## Fonctionnalités
+
+- Formulaire de contact moderne et responsive
+- Envoi d'emails sécurisé via SMTP
+- Support de l'authentification Gmail avec mots de passe d'application
+- Interface utilisateur soignée avec CSS intégré
+- Configuration facile via variables d'environnement
+- Gestion d'erreurs robuste
+
+## Installation Rapide
 
 ### Prérequis
 
-- Python 3.7+
-- Un compte Gmail avec mot de passe d'application
+- Python 3.7 ou supérieur
+- Un compte Gmail avec l'authentification à deux facteurs activée
 
-### Installation
+### 1. Cloner le projet
 
-1. **Clonez le dépôt**
 ```bash
 git clone https://github.com/dadal560/flask-mailer.git
 cd flask-mailer
 ```
 
-2. **Créez un environnement virtuel**
+### 2. Environnement virtuel
+
 ```bash
+# Créer l'environnement virtuel
 python -m venv venv
-source venv/bin/activate  # Sur Windows: venv\Scripts\activate
+
+# L'activer
+# Sur Linux/Mac :
+source venv/bin/activate
+# Sur Windows :
+venv\Scripts\activate
 ```
 
-3. **Installez les dépendances**
+### 3. Installer les dépendances
+
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Configuration des variables d'environnement**
+### 4. Configuration
 
 Créez un fichier `.env` à la racine du projet :
 
 ```env
-FLASK_SECRET_KEY=votre_clé_secrète_très_longue_et_complexe
+FLASK_SECRET_KEY=votre_clé_secrète_très_longue_et_sécurisée_ici
 MAIL_USERNAME=votre.email@gmail.com
-MAIL_PASSWORD=votre_mot_de_passe_application
+MAIL_PASSWORD=votre_mot_de_passe_application_gmail
 ```
 
-### Configuration Gmail
-
-1. Activez l'authentification à deux facteurs sur votre compte Gmail
-2. Générez un mot de passe d'application :
-   - Allez dans **Compte Google** → **Sécurité**
-   - Cliquez sur **Mots de passe des applications**
-   - Sélectionnez **Autre** et nommez-le "Flask App"
-   - Utilisez le mot de passe généré dans le fichier `.env`
-
-## Utilisation
-
-### Lancement de l'application
+### 5. Lancer l'application
 
 ```bash
 python app.py
 ```
 
-L'application sera accessible sur `http://127.0.0.1:5000`
+Votre application est maintenant accessible sur `http://127.0.0.1:5000`
 
-### Structure du projet
+## Configuration Gmail
+
+Pour utiliser Gmail comme serveur SMTP :
+
+1. **Activez l'authentification à deux facteurs** sur votre compte Google
+2. **Générez un mot de passe d'application** :
+   - Accédez à [myaccount.google.com](https://myaccount.google.com)
+   - Allez dans **Sécurité** → **Mots de passe des applications**
+   - Sélectionnez **Autre (nom personnalisé)** et tapez "Flask Mailer"
+   - Copiez le mot de passe généré (16 caractères) dans votre fichier `.env`
+
+## Structure du Projet
 
 ```
-flask-contact-form/
+flask-mailer/
 ├── app.py              # Application Flask principale
 ├── templates/
-│   └── index.html      # Template du formulaire
+│   └── index.html      # Template du formulaire de contact
 ├── .env               # Variables d'environnement (à créer)
 ├── requirements.txt   # Dépendances Python
-└── README.md         # Documentation
+├── README.md         # Cette documentation
+└── .gitignore        # Fichiers à ignorer par Git
 ```
 
-## Fichier requirements.txt
+## Dépendances
 
 ```txt
 Flask==2.3.3
@@ -79,25 +100,31 @@ python-dotenv==1.0.0
 
 ## Configuration Avancée
 
-### Personnalisation du serveur SMTP
+### Utiliser d'autres fournisseurs d'email
 
-Pour utiliser un autre fournisseur d'email, modifiez les paramètres dans `app.py` :
+Modifiez les paramètres SMTP dans `app.py` :
 
+#### Outlook/Hotmail
 ```python
-# Pour Outlook/Hotmail
 app.config.update(
     MAIL_SERVER='smtp.live.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
-    # ...
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD')
 )
+```
 
-# Pour Yahoo
+#### Yahoo Mail
+```python
 app.config.update(
     MAIL_SERVER='smtp.mail.yahoo.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
-    # ...
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD')
 )
 ```
 
@@ -105,95 +132,138 @@ app.config.update(
 
 | Variable | Description | Exemple |
 |----------|-------------|---------|
-| `FLASK_SECRET_KEY` | Clé secrète pour Flask | `your-super-secret-key-here` |
-| `MAIL_USERNAME` | Email expéditeur | `votre.email@gmail.com` |
+| `FLASK_SECRET_KEY` | Clé secrète Flask (générez-en une unique) | `ma-super-clé-secrète-2024` |
+| `MAIL_USERNAME` | Adresse email expéditrice | `contact@monsite.com` |
 | `MAIL_PASSWORD` | Mot de passe d'application | `abcd efgh ijkl mnop` |
-
 
 ## Personnalisation
 
-### Modification du style
+### Modifier l'apparence
 
-Le CSS est intégré dans le fichier `templates/index.html`. Vous pouvez :
+Le CSS se trouve dans `templates/index.html`. Vous pouvez personnaliser :
+- **Couleurs** : Modifiez les valeurs dans les propriétés `background`, `color`, etc.
+- **Police** : Changez `font-family` pour utiliser une autre police
+- **Layout** : Ajustez les `padding`, `margin`, `width` pour l'espacement
 
-- Modifier les couleurs en changeant les valeurs hexadécimales
-- Ajuster les tailles et espacements
-- Ajouter des animations CSS
+### Personnaliser le contenu des emails
 
-### Personnalisation du message
-
-Dans `app.py`, modifiez le contenu du message :
+Dans `app.py`, modifiez le template du message :
 
 ```python
-body=f"""
-Nouveau message de contact
+body = f"""
+Nouveau message depuis votre site web
 
-Expéditeur: {client_email}
-Date: {datetime.now().strftime('%d/%m/%Y %H:%M')}
+Expéditeur : {client_email}
+Date : {datetime.now().strftime('%d/%m/%Y à %H:%M')}
+IP : {request.remote_addr}
 
-Message:
+Message :
 {client_message}
+
+---
+Envoyé automatiquement par Flask Mailer
 """
-```
-
-## Dépannage
-
-### Problèmes courants
-
-**Erreur d'authentification Gmail**
-- Vérifiez que l'authentification 2FA est activée
-- Utilisez un mot de passe d'application, pas votre mot de passe principal
-
-**Erreur "Variables d'environnement manquantes"**
-- Vérifiez que le fichier `.env` existe
-- Assurez-vous que toutes les variables sont définies
-
-**Page ne se charge pas**
-- Vérifiez que le port 5000 n'est pas utilisé
-- Essayez de changer le port dans `app.run(port=5001)`
-
-### Logs de débogage
-
-Activez le mode debug pour plus d'informations :
-
-```python
-app.run(debug=True)
 ```
 
 ## Déploiement
 
-### Déploiement Heroku
+### Heroku
 
 1. Créez un `Procfile` :
 ```
 web: python app.py
 ```
 
-2. Configurez les variables d'environnement sur Heroku :
+2. Configurez les variables d'environnement :
 ```bash
-heroku config:set FLASK_SECRET_KEY=your-secret-key
-heroku config:set MAIL_USERNAME=your-email@gmail.com
-heroku config:set MAIL_PASSWORD=your-app-password
+heroku config:set FLASK_SECRET_KEY="votre-clé-secrète"
+heroku config:set MAIL_USERNAME="votre-email@gmail.com"
+heroku config:set MAIL_PASSWORD="votre-mot-de-passe-app"
 ```
+
+3. Déployez :
+```bash
+git add .
+git commit -m "Initial deployment"
+heroku create votre-app-name
+git push heroku main
+```
+
+### Railway / Render
+
+Ces plateformes supportent également Flask. Consultez leur documentation respective pour les instructions de déploiement.
+
+## Dépannage
+
+### Problèmes courants
+
+**Erreur d'authentification Gmail**
+```
+Solution : Vérifiez que vous utilisez un mot de passe d'application et non votre mot de passe principal
+```
+
+**Variables d'environnement non trouvées**
+```
+Solution : Vérifiez que le fichier .env existe et contient toutes les variables requises
+```
+
+**Port 5000 déjà utilisé**
+```python
+# Dans app.py, changez le port :
+app.run(host='0.0.0.0', port=5001, debug=False)
+```
+
+### Mode débogage
+
+Pour diagnostiquer les problèmes, activez le mode debug :
+
+```python
+app.run(debug=True)
+```
+
+**Important** : Désactivez le mode debug en production !
+
+## Sécurité
+
+- Ne commitez jamais votre fichier `.env`
+- Utilisez des clés secrètes uniques et complexes
+- Activez HTTPS en production
+- Validez et sanitisez les entrées utilisateur
 
 ## Contribution
 
-Les contributions sont les bienvenues ! N'hésitez pas à :
+Les contributions sont les bienvenues ! Pour contribuer :
 
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité
-3. Commit vos changements
-4. Push vers la branche
-5. Ouvrir une Pull Request
-
+1. **Fork** ce repository
+2. Créez votre branche (`git checkout -b feature/nouvelle-fonctionnalité`)
+3. Commitez vos changements (`git commit -am 'Ajoute nouvelle fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalité`)
+5. Ouvrez une Pull Request
 
 ## Support
 
-Pour toute question ou problème :
+Besoin d'aide ? Plusieurs options :
 
-- Email : gwen.henry56@gmail.com
-- Issues : [GitHub Issues](https://github.com/dadal560/flask-mailer/issues)
+- **Email** : [gwen.henry56@gmail.com](mailto:gwen.henry56@gmail.com)
+- **Issues** : [GitHub Issues](https://github.com/dadal560/flask-mailer/issues)
+- **Discussions** : [GitHub Discussions](https://github.com/dadal560/flask-mailer/discussions)
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## Remerciements
+
+- Merci à l'équipe Flask pour ce framework fantastique
+- Merci aux contributeurs de Flask-Mail
+- Inspiré par les meilleures pratiques de développement web moderne
 
 ---
 
-⭐ **N'oubliez pas de star le projet si il vous a été utile !**
+<div align="center">
+
+**Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !**
+
+[Retour en haut](#flask-mailer)
+
+</div>
