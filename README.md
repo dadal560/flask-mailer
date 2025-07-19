@@ -13,7 +13,6 @@ Une application web élégante et simple pour envoyer des emails via un formulai
 - Support de l'authentification Gmail avec mots de passe d'application
 - Interface utilisateur soignée avec CSS intégré
 - Configuration facile via variables d'environnement
-- Gestion d'erreurs robuste
 
 ## Installation Rapide
 
@@ -252,11 +251,4 @@ Besoin d'aide ? Plusieurs options :
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-
-<div align="center">
-
-**Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !**
-
-[Retour en haut](#flask-mailer)
-
-</div>
+⭐ Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !
