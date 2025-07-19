@@ -8,10 +8,9 @@ Une application web élégante et simple pour envoyer des emails via un formulai
 
 ## Fonctionnalités
 
-- Formulaire de contact moderne et responsive
+- Formulaire de contact
 - Envoi d'emails sécurisé via SMTP
 - Support de l'authentification Gmail avec mots de passe d'application
-- Interface utilisateur soignée avec CSS intégré
 - Configuration facile via variables d'environnement
 
 ## Installation Rapide
@@ -227,17 +226,7 @@ app.run(debug=True)
 - Ne commitez jamais votre fichier `.env`
 - Utilisez des clés secrètes uniques et complexes
 - Activez HTTPS en production
-- Validez et sanitisez les entrées utilisateur
 
-## Contribution
-
-Les contributions sont les bienvenues ! Pour contribuer :
-
-1. **Fork** ce repository
-2. Créez votre branche (`git checkout -b feature/nouvelle-fonctionnalité`)
-3. Commitez vos changements (`git commit -am 'Ajoute nouvelle fonctionnalité'`)
-4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalité`)
-5. Ouvrez une Pull Request
 
 ## Support
 
