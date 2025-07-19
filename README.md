@@ -236,8 +236,4 @@ Besoin d'aide ? Plusieurs options :
 - **Issues** : [GitHub Issues](https://github.com/dadal560/flask-mailer/issues)
 - **Discussions** : [GitHub Discussions](https://github.com/dadal560/flask-mailer/discussions)
 
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
 ⭐ Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !
