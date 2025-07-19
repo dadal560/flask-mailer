@@ -252,13 +252,6 @@ Besoin d'aide ? Plusieurs options :
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## Remerciements
-
-- Merci à l'équipe Flask pour ce framework fantastique
-- Merci aux contributeurs de Flask-Mail
-- Inspiré par les meilleures pratiques de développement web moderne
-
----
 
 <div align="center">
 
