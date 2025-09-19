@@ -74,9 +74,12 @@ flask-contact-form/
 ## Fichier requirements.txt
 
 ```txt
-Flask==2.3.3
+Flask==3.0.0
 Flask-Mail==0.9.1
+Flask-WTF==1.2.1
+WTForms==3.1.1
 python-dotenv==1.0.0
+email-validator==2.1.0
 ```
 
 ## Configuration Avancée
