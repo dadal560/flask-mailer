@@ -80,6 +80,7 @@ Flask-WTF==1.2.1
 WTForms==3.1.1
 python-dotenv==1.0.0
 email-validator==2.1.0
+gunicorn==21.2.0
 ```
 
 ## Configuration Avancée
@@ -167,19 +168,154 @@ app.run(debug=True)
 
 ## Déploiement
 
-### Déploiement Heroku
+### Déploiement avec Gunicorn (Recommandé)
 
-1. Créez un `Procfile` :
-```
-web: python app.py
-```
-
-2. Configurez les variables d'environnement sur Heroku :
+**Installation de Gunicorn**
 ```bash
-heroku config:set FLASK_SECRET_KEY=your-secret-key
-heroku config:set MAIL_USERNAME=your-email@gmail.com
-heroku config:set MAIL_PASSWORD=your-app-password
+pip install gunicorn
 ```
+
+**Fichiers nécessaires**
+
+**wsgi.py** (point d'entrée) :
+```python
+from app import app
+
+if __name__ == "__main__":
+    app.run()
+```
+
+**Commandes de déploiement**
+
+Développement local :
+```bash
+# Test simple
+gunicorn --bind 127.0.0.1:8000 --reload app:app
+
+# Avec logs détaillés  
+gunicorn --bind 127.0.0.1:8000 --reload --log-level debug app:app
+```
+
+Production :
+```bash
+# Configuration basique
+gunicorn --bind 0.0.0.0:8000 --workers 4 app:app
+
+# Configuration optimisée
+gunicorn \
+  --bind 0.0.0.0:8000 \
+  --workers 4 \
+  --timeout 60 \
+  --keep-alive 2 \
+  --max-requests 1000 \
+  --access-logfile access.log \
+  --error-logfile error.log \
+  app:app
+
+# En arrière-plan
+gunicorn --bind 0.0.0.0:8000 --workers 4 --daemon --pid gunicorn.pid app:app
+```
+
+**Pourquoi Gunicorn ?**
+- ✅ Serveur WSGI robuste pour la production
+- ✅ Gestion multi-workers (performance)
+- ✅ Redémarrage automatique en cas de crash
+- ✅ Logs avancés et monitoring
+- ✅ Compatible avec tous les hébergeurs
+
+### Déploiement sur VPS (OVH, DigitalOcean, etc.)
+
+**1. Connexion et setup serveur**
+```bash
+# Connexion SSH
+ssh root@votre-ip-serveur
+
+# Mise à jour système
+apt update && apt upgrade -y
+
+# Installation dépendances
+apt install python3 python3-pip python3-venv nginx git -y
+```
+
+**2. Déploiement application**
+```bash
+# Clone du projet
+git clone https://github.com/dadal560/flask-mailer.git
+cd flask-mailer
+
+# Environnement virtuel
+python3 -m venv venv
+source venv/bin/activate
+
+# Installation dépendances
+pip install -r requirements.txt
+
+# Configuration variables d'environnement
+cp .env.example .env
+nano .env  # Éditer avec vos valeurs
+```
+
+**3. Configuration systemd**
+Créer `/etc/systemd/system/flask-mailer.service` :
+```ini
+[Unit]
+Description=Flask Mailer avec Gunicorn
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/flask-mailer
+Environment=PATH=/root/flask-mailer/venv/bin
+EnvironmentFile=/root/flask-mailer/.env
+ExecStart=/root/flask-mailer/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**4. Configuration Nginx**
+Créer `/etc/nginx/sites-available/flask-mailer` :
+```nginx
+server {
+    listen 80;
+    server_name votre-domaine.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+**5. Activation et démarrage**
+```bash
+# Service systemd
+systemctl daemon-reload
+systemctl enable flask-mailer
+systemctl start flask-mailer
+systemctl status flask-mailer
+
+# Nginx
+ln -s /etc/nginx/sites-available/flask-mailer /etc/nginx/sites-enabled/
+nginx -t
+systemctl reload nginx
+
+# Firewall (optionnel)
+ufw allow 22
+ufw allow 80
+ufw allow 443
+ufw enable
+```
+
+### Plateformes alternatives
+- **Railway** - Simple et gratuit
+- **Render** - Excellent pour Flask
+- **Fly.io** - Performant
+- **Vercel** - Pour applications statiques
 
 ## Contribution
 
