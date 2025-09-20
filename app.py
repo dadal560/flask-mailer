@@ -18,6 +18,7 @@ for var in ['FLASK_SECRET_KEY', 'MAIL_USERNAME', 'MAIL_PASSWORD']:
 # Config Flask
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
+# Protection contre les attaques CSRF sur les formulaires
 csrf = CSRFProtect(app)
 
 # Config email
