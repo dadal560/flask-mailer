@@ -38,6 +38,7 @@ Créez un fichier `.env` à la racine du projet :
 FLASK_SECRET_KEY=votre_clé_secrète_très_longue_et_complexe
 MAIL_USERNAME=votre.email@gmail.com
 MAIL_PASSWORD=votre_mot_de_passe_application
+MAIL_RECIPIENTS=destinataire1@gmail.com,destinataire2@gmail.com
 ```
 
 ### Configuration Gmail
@@ -54,7 +55,7 @@ MAIL_PASSWORD=votre_mot_de_passe_application
 ### Lancement de l'application
 
 ```bash
-python app.py
+python run.py
 ```
 
 L'application sera accessible sur `http://127.0.0.1:5000`
@@ -62,13 +63,19 @@ L'application sera accessible sur `http://127.0.0.1:5000`
 ### Structure du projet
 
 ```
-flask-contact-form/
-├── app.py              # Application Flask principale
-├── templates/
-│   └── index.html      # Template du formulaire
-├── .env               # Variables d'environnement (à créer)
-├── requirements.txt   # Dépendances Python
-└── README.md         # Documentation
+mailer-flask/
+│── .env                    # Variables d'environnement
+│── run.py                 # Point d'entrée de l'application
+│── app.log               # Fichier de logs
+│── requirements.txt      # Dépendances Python
+│── README.md            # Documentation
+│── app/
+│   ├── __init__.py      # Initialisation Flask
+│   ├── config.py        # Configuration
+│   ├── forms.py         # Formulaires WTForms
+│   ├── routes.py        # Routes et logique métier
+│   └── templates/
+│       └── index.html   # Template du formulaire
 ```
 
 ## Fichier requirements.txt
@@ -87,59 +94,105 @@ gunicorn==21.2.0
 
 ### Personnalisation du serveur SMTP
 
-Pour utiliser un autre fournisseur d'email, modifiez les paramètres dans `app.py` :
+Pour utiliser un autre fournisseur d'email, modifiez les paramètres dans `app/config.py` :
 
 ```python
-# Pour Outlook/Hotmail
-app.config.update(
-    MAIL_SERVER='smtp.live.com',
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    # ...
-)
-
-# Pour Yahoo
-app.config.update(
-    MAIL_SERVER='smtp.mail.yahoo.com',
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    # ...
-)
+class Config:
+    # Pour Outlook/Hotmail
+    MAIL_SERVER = "smtp.live.com"
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    
+    # Pour Yahoo
+    # MAIL_SERVER = "smtp.mail.yahoo.com"
+    # MAIL_PORT = 587
+    # MAIL_USE_TLS = True
 ```
 
-### Variables d'environnement
+## Architecture et Fonctionnalités
 
-| Variable | Description | Exemple |
-|----------|-------------|---------|
-| `FLASK_SECRET_KEY` | Clé secrète pour Flask | `your-super-secret-key-here` |
-| `MAIL_USERNAME` | Email expéditeur | `votre.email@gmail.com` |
-| `MAIL_PASSWORD` | Mot de passe d'application | `abcd efgh ijkl mnop` |
+### Fonctionnalités principales
+- ✅ **Factory Pattern** : Structure modulaire avec `create_app()`
+- ✅ **Blueprints** : Organisation claire des routes
+- ✅ **CSRF Protection** : Sécurité contre les attaques cross-site
+- ✅ **Logging intégré** : Traçabilité des actions et erreurs
+- ✅ **Validation robuste** : WTForms avec validateurs
+- ✅ **Configuration centralisée** : Variables d'environnement
+- ✅ **Destinataires multiples** : Support d'emails multiples
 
+### Structure modulaire
+
+**`run.py`** - Point d'entrée
+```python
+from app import create_app
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+**`app/__init__.py`** - Factory et initialisation
+- Initialise Flask, Mail, CSRF
+- Configure le logging
+- Enregistre les blueprints
+
+**`app/config.py`** - Configuration centralisée
+- Gestion des variables d'environnement
+- Configuration SMTP
+- Support destinataires multiples
+
+**`app/forms.py`** - Formulaires WTForms
+- Validation email et message
+- Protection CSRF intégrée
+
+**`app/routes.py`** - Logique métier
+- Routes organisées en blueprint
+- Gestion des erreurs
+- Logging des actions
 
 ## Personnalisation
 
 ### Modification du style
 
-Le CSS est intégré dans le fichier `templates/index.html`. Vous pouvez :
+Le template utilise Bootstrap 5. Dans `app/templates/index.html` vous pouvez :
 
-- Modifier les couleurs en changeant les valeurs hexadécimales
-- Ajuster les tailles et espacements
-- Ajouter des animations CSS
+- Modifier les classes Bootstrap
+- Ajouter du CSS personnalisé
+- Personnaliser les messages flash
 
 ### Personnalisation du message
 
-Dans `app.py`, modifiez le contenu du message :
+Dans `app/routes.py`, modifiez le contenu du message :
 
 ```python
-body=f"""
-Nouveau message de contact
+body=(
+    f"Nouveau contact\n"
+    f"De: {form.email.data}\n"
+    f"IP: {request.remote_addr}\n"
+    f"Date: {datetime.now().strftime('%d/%m/%Y %H:%M')}\n\n"
+    f"Message:\n{form.message.data}"
+)
+```
 
-Expéditeur: {client_email}
-Date: {datetime.now().strftime('%d/%m/%Y %H:%M')}
+### Ajout de champs au formulaire
 
-Message:
-{client_message}
-"""
+1. **Dans `app/forms.py`** :
+```python
+class ContactForm(FlaskForm):
+    name = StringField("Nom", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    subject = StringField("Sujet", validators=[DataRequired()])
+    message = TextAreaField("Message", validators=[DataRequired()])
+    submit = SubmitField("Envoyer")
+```
+
+2. **Dans le template `app/templates/index.html`** :
+```html
+<div class="mb-3">
+  {{ form.name.label }}<br>
+  {{ form.name(class="form-control") }}
+</div>
 ```
 
 ## Dépannage
@@ -151,19 +204,25 @@ Message:
 - Utilisez un mot de passe d'application, pas votre mot de passe principal
 
 **Erreur "Variables d'environnement manquantes"**
-- Vérifiez que le fichier `.env` existe
+- Vérifiez que le fichier `.env` existe à la racine
 - Assurez-vous que toutes les variables sont définies
 
-**Page ne se charge pas**
-- Vérifiez que le port 5000 n'est pas utilisé
-- Essayez de changer le port dans `app.run(port=5001)`
+**Erreur de module non trouvé**
+- Vérifiez que vous êtes dans l'environnement virtuel
+- Réinstallez les dépendances : `pip install -r requirements.txt`
 
 ### Logs de débogage
 
-Activez le mode debug pour plus d'informations :
+Les logs sont automatiquement sauvegardés dans `app.log`. Pour plus de détails :
 
 ```python
+# Dans run.py
 app.run(debug=True)
+```
+
+Consultez les logs :
+```bash
+tail -f app.log
 ```
 
 ## Déploiement
@@ -175,31 +234,21 @@ app.run(debug=True)
 pip install gunicorn
 ```
 
-**Fichiers nécessaires**
-
-**wsgi.py** (point d'entrée) :
-```python
-from app import app
-
-if __name__ == "__main__":
-    app.run()
-```
-
 **Commandes de déploiement**
 
 Développement local :
 ```bash
 # Test simple
-gunicorn --bind 127.0.0.1:8000 --reload app:app
+gunicorn --bind 127.0.0.1:8000 --reload run:app
 
 # Avec logs détaillés  
-gunicorn --bind 127.0.0.1:8000 --reload --log-level debug app:app
+gunicorn --bind 127.0.0.1:8000 --reload --log-level debug run:app
 ```
 
 Production :
 ```bash
 # Configuration basique
-gunicorn --bind 0.0.0.0:8000 --workers 4 app:app
+gunicorn --bind 0.0.0.0:8000 --workers 4 run:app
 
 # Configuration optimisée
 gunicorn \
@@ -210,10 +259,7 @@ gunicorn \
   --max-requests 1000 \
   --access-logfile access.log \
   --error-logfile error.log \
-  app:app
-
-# En arrière-plan
-gunicorn --bind 0.0.0.0:8000 --workers 4 --daemon --pid gunicorn.pid app:app
+  run:app
 ```
 
 **Pourquoi Gunicorn ?**
@@ -267,7 +313,7 @@ User=root
 WorkingDirectory=/root/flask-mailer
 Environment=PATH=/root/flask-mailer/venv/bin
 EnvironmentFile=/root/flask-mailer/.env
-ExecStart=/root/flask-mailer/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
+ExecStart=/root/flask-mailer/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 run:app
 Restart=always
 
 [Install]
@@ -326,7 +372,6 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 3. Commit vos changements
 4. Push vers la branche
 5. Ouvrir une Pull Request
-
 
 ## Support
 
