@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_mail import Message
-from .forms import ContactForm
+from .forms import ContactForm # Import relatif : "forms" est dans le même dossier (package app), 
 from . import mail
 import logging
 import os

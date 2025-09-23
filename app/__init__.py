@@ -2,7 +2,7 @@ import logging
 from flask import Flask
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
-from .config import Config
+from .config import Config # Import relatif : "config" est dans le même dossier (package app)
 
 mail = Mail()
 csrf = CSRFProtect() # Protection contre les attaques CSRF
