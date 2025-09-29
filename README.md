@@ -1,6 +1,6 @@
 # Flask mailer
 
-Une application web simple pour envoyer des emails via un formulaire de contact, construite avec Flask et Flask-Mail.
+Une application web simple pour envoyer des emails via un formulaire de contact réalisé avec Flask/Flask-Mail.
 
 ## Installation et Configuration
 
